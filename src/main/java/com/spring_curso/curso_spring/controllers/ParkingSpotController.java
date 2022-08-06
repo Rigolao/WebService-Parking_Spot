@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,15 +32,6 @@ public class ParkingSpotController {
     @PostMapping
     //@Valid faz as anotações do DTO funcionarem
     public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDTO parkingSpotDTO) {
-        if (parkingSpotService.existsByLicensePlateCar(parkingSpotDTO.getLicensePlateCar())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Lincense Plate Car is alredy in use!");
-        }
-        if (parkingSpotService.existsByParkingSpotNumber(parkingSpotDTO.getParkingSpotNumber())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Parking Spot Number is alredy in use!");
-        }
-        if (parkingSpotService.existsByApartmentAndBlock(parkingSpotDTO.getApartment(), parkingSpotDTO.getBlock())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Parking Spot alredy registered for this apartment/block!");
-        }
         var parkingSpotModel = new ParkingSpotModel();
         //Esse metodo recebe o que vai ser convertido e no que ele vai virar, como a função from do VO
         BeanUtils.copyProperties(parkingSpotDTO, parkingSpotModel);
@@ -51,25 +41,20 @@ public class ParkingSpotController {
 
     @GetMapping
     public ResponseEntity<Page<ParkingSpotModel>> getAllParkingSpots(
-            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.findAll(pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getOneParkingSpot(@PathVariable(value = "id") UUID id) {
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
-        if (!parkingSpotModelOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parking Spot not found.");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotModelOptional.get());
+        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotModelOptional);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteParkingSpot(@PathVariable(value = "id") UUID id) {
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
-        if (!parkingSpotModelOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parking Spot not found.");
-        }
+        //metodo get sendo verificado dentro do service
         parkingSpotService.delete(parkingSpotModelOptional.get());
         return ResponseEntity.status(HttpStatus.OK).body("Parking Spot deleted sucessfully.");
     }
@@ -78,9 +63,6 @@ public class ParkingSpotController {
     public ResponseEntity<Object> updateParkingSpot(@PathVariable(value = "id") UUID id,
                                                     @RequestBody @Valid ParkingSpotDTO parkingSpotDTO) {
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
-        if (!parkingSpotModelOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parking Spot not found.");
-        }
         var parkingSpotModel = parkingSpotModelOptional.get();
 
         //Forma 1:
@@ -97,6 +79,6 @@ public class ParkingSpotController {
         BeanUtils.copyProperties(parkingSpotDTO, parkingSpotModel);
         parkingSpotModel.setId(parkingSpotModelOptional.get().getId());
         parkingSpotModel.setRegistrationDate(parkingSpotModelOptional.get().getRegistrationDate());
-        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.save(parkingSpotModel));
+        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.edit(parkingSpotModel));
     }
 }

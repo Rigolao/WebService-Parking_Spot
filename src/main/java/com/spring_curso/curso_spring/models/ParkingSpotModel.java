@@ -1,6 +1,7 @@
 package com.spring_curso.curso_spring.models;
 
 import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -8,6 +9,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "TB_PARKING_SPOT")
 public class ParkingSpotModel implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

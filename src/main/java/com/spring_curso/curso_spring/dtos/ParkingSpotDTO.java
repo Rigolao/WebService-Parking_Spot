@@ -5,6 +5,8 @@ import javax.validation.constraints.Size;
 
 public class ParkingSpotDTO {
 
+    //Getters e Setter necessários para a tranformação da entidade para DTO
+
     @NotBlank
     private String parkingSpotNumber;
 
