@@ -1,9 +1,6 @@
 package com.spring_curso.curso_spring.services;
 
-import com.spring_curso.curso_spring.exceptions.InvalidApartmentAndBlockException;
-import com.spring_curso.curso_spring.exceptions.InvalidLicensePlateCarException;
-import com.spring_curso.curso_spring.exceptions.InvalidParkingSpotNumberException;
-import com.spring_curso.curso_spring.exceptions.NotFoundException;
+import com.spring_curso.curso_spring.exceptions.*;
 import com.spring_curso.curso_spring.models.ParkingSpotModel;
 import com.spring_curso.curso_spring.repositories.ParkingSpotRepository;
 import org.springframework.data.domain.Page;
@@ -11,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,6 +33,26 @@ public class ParkingSpotService {
             throw new InvalidApartmentAndBlockException();
         }
         return parkingSpotRepository.save(parkingSpotModel);
+    }
+
+    @Transactional
+    public List<ParkingSpotModel> saveList(List<ParkingSpotModel> parkingSpotModelList){
+        if(parkingSpotModelList.isEmpty()){
+            throw new EmptyListException();
+        }
+        if(parkingSpotModelList.stream().anyMatch(
+                p -> existsByParkingSpotNumber(p.getParkingSpotNumber()))){
+            throw new InvalidParkingSpotNumberException();
+        }
+        if(parkingSpotModelList.stream().anyMatch(
+                p -> existsByApartmentAndBlock(p.getApartment(), p.getBlock()))){
+            throw new InvalidApartmentAndBlockException();
+        }
+        if(parkingSpotModelList.stream().anyMatch(
+                p -> existsByLicensePlateCar(p.getLicensePlateCar()))){
+            throw new InvalidLicensePlateCarException();
+        }
+        return parkingSpotRepository.saveAll(parkingSpotModelList);
     }
 
     public boolean existsByLicensePlateCar(String licensePlateCar) {

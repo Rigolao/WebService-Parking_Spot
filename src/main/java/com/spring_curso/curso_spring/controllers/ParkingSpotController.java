@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -24,6 +23,8 @@ import java.util.UUID;
 public class ParkingSpotController {
 
     private final ParkingSpotService parkingSpotService;
+
+    //Utilizar a anotação @AutoWired quando houver mais de um construtor na classe
 
     public ParkingSpotController(ParkingSpotService parkingSpotService) {
         this.parkingSpotService = parkingSpotService;
@@ -37,6 +38,20 @@ public class ParkingSpotController {
         BeanUtils.copyProperties(parkingSpotDTO, parkingSpotModel);
         parkingSpotModel.setRegistrationDate(LocalDateTime.now(ZoneId.of("UTC")));
         return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotService.save(parkingSpotModel));
+    }
+
+    @PostMapping("/save-list")
+    public ResponseEntity<Object> saveListParkingSpots(
+            @RequestBody @Valid List<ParkingSpotDTO> parkingSpotDTOList) {
+        List<ParkingSpotModel> parkingSpotModelList = new ArrayList<>();
+        parkingSpotDTOList.forEach(dto -> {
+            var parkingSpotModel = new ParkingSpotModel();
+            BeanUtils.copyProperties(dto, parkingSpotModel);
+            parkingSpotModel.setRegistrationDate(LocalDateTime.now(ZoneId.of("UTC")));
+            parkingSpotModelList.add(parkingSpotModel);
+        });
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                parkingSpotService.saveList(parkingSpotModelList));
     }
 
     @GetMapping

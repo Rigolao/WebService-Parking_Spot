@@ -8,14 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 public class CursoSpringApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(CursoSpringApplication.class, args);
-    }
-
-    @GetMapping("/")
-    public String index() {
-        return "Olá Mundo!";
     }
 
 }

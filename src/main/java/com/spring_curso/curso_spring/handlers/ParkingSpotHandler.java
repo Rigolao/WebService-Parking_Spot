@@ -1,10 +1,7 @@
 package com.spring_curso.curso_spring.handlers;
 
 import com.spring_curso.curso_spring.controllers.ParkingSpotController;
-import com.spring_curso.curso_spring.exceptions.InvalidApartmentAndBlockException;
-import com.spring_curso.curso_spring.exceptions.InvalidLicensePlateCarException;
-import com.spring_curso.curso_spring.exceptions.InvalidParkingSpotNumberException;
-import com.spring_curso.curso_spring.exceptions.NotFoundException;
+import com.spring_curso.curso_spring.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -46,6 +43,12 @@ public class ParkingSpotHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleNotFoundException(NotFoundException ex){
         var body = _fillErrorBodyMessage(ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EmptyListException.class)
+    public ResponseEntity<Object> handleEmptyListException(EmptyListException ex){
+        var body = _fillErrorBodyMessage(ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
