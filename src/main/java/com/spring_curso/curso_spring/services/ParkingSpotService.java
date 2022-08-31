@@ -6,6 +6,7 @@ import com.spring_curso.curso_spring.repositories.ParkingSpotRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -39,6 +40,14 @@ public class ParkingSpotService {
     public List<ParkingSpotModel> saveList(List<ParkingSpotModel> parkingSpotModelList){
         if(parkingSpotModelList.isEmpty()){
             throw new EmptyListException();
+        }
+
+        for(int i=0; i < parkingSpotModelList.size(); i++){
+            for(int j = i; j < parkingSpotModelList.size(); j++){
+                if(parkingSpotModelList.get(i).equals(parkingSpotModelList.get(j))){
+                    throw new DuplicateItemException();
+                }
+            }
         }
         if(parkingSpotModelList.stream().anyMatch(
                 p -> existsByParkingSpotNumber(p.getParkingSpotNumber()))){

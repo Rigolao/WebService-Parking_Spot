@@ -44,6 +44,10 @@ public class ParkingSpotModel implements Serializable {
     @Column(nullable = false, length = 30)
     private String block;
 
+    @Lob
+    @Column(name = "photo")
+    private byte[] photo;
+
     public UUID getId() {
         return id;
     }
@@ -122,5 +126,13 @@ public class ParkingSpotModel implements Serializable {
 
     public void setBlock(String block) {
         this.block = block;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
     }
 }

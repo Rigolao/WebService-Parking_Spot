@@ -9,17 +9,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/parking-spot")
+@RequestMapping(value = "/parking-spot")
 public class ParkingSpotController {
 
     private final ParkingSpotService parkingSpotService;
@@ -30,12 +34,17 @@ public class ParkingSpotController {
         this.parkingSpotService = parkingSpotService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     //@Valid faz as anotações do DTO funcionarem
-    public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDTO parkingSpotDTO) {
+    public ResponseEntity<Object> saveParkingSpot(@RequestPart(value = "photo", required = false) MultipartFile photo,
+                                                  @RequestPart(value = "data", required = true) @Valid ParkingSpotDTO parkingSpotDTO) throws IOException {
         var parkingSpotModel = new ParkingSpotModel();
         //Esse metodo recebe o que vai ser convertido e no que ele vai virar, como a função from do VO
         BeanUtils.copyProperties(parkingSpotDTO, parkingSpotModel);
+        if(photo != null){
+            System.out.println("Deu bom!!!!");
+            parkingSpotModel.setPhoto(photo.getBytes());
+        }
         parkingSpotModel.setRegistrationDate(LocalDateTime.now(ZoneId.of("UTC")));
         return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotService.save(parkingSpotModel));
     }

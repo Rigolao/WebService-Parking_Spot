@@ -51,6 +51,12 @@ public class ParkingSpotHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(DuplicateItemException.class)
+    public ResponseEntity<Object> handleEmptyListException(DuplicateItemException ex){
+        var body = _fillErrorBodyMessage(ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGenericError(Exception ex){
         var body = _fillErrorBodyMessage(ex.getMessage());
